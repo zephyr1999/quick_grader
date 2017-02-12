@@ -55,6 +55,8 @@ def run_with_files(input_file, output_file, rubric, directory,compiler):
     # run the student's file
     subprocess.run(['python',student_exe],stdin=open(input_file),stdout=open("out.txt",'w'))
 
+    #TODO allowe user to set output file
+
     #TODO compare out.txt with output file
 
     #TODO grade output
