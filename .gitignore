@@ -1,3 +1,5 @@
 __data/
 TODO.txt
 .DS_Store
+v1_quick_grader.py
+.gitignore

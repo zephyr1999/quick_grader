@@ -1,91 +1,44 @@
-# quick_grader is a way to quickly grade a full (potentially zipped) directory of
-# student's files downloaded from moodle. User specifies a file or directory,
-# whether or not its zipped, and then parses the student's files. It unzippes 
-# them if necessary, does a compile with the specified compiler, and runs with 
-# given input/output files (or interacts with the user) and grades according 
-# to a specified rubric. 
-
 import sys
-import os
 import subprocess
+import getopt
 
 def handle_args():
-    #TODO impliment me
-    input_file = "input1.txt"
-    output_file = "output1.txt"
-    rubric_file = "rubric.txt"
-    directory = "anon_data/"
-    compiler = "python"
+    # too lazy to handle args with a library so I do it like this.
+    # ARG LIST
+    # -z => (True/False) directory file is a zip and needs to be unzipped
+    # -f filename => input file. if not specified, user wants to interact.
+    try:
+        opts,args = getopt.getopt(sys.argv[1:],"d:zf:",['directory=','zipped','file='])
+    except getopt.GetoptError:
+        print("usage: quick_grader.py -d <directory> -z -f <inputfile>")
+        sys.exit()
+    
+    #initialize these arguments because we need to handle the cases that they aren't specified
+    directory = None
+    in_file = None
     zipped = False
 
-    return input_file, output_file, rubric_file, compiler, directory, zipped
+    # actually handle the arguments
+    for opt,arg in opts:
+        # first, set the directory
+        if opt in ['-d','--directory']:
+            directory = arg
 
-def unzip(directory):
-    #TODO impliment me
-    # directory ends in '.zip' so we unzip and return the unziped filename
-    # for now, jsut call teh directory extracted
-    subprocess.check_output(["unzip", directory, '-d','extracted'])
-    return 'extracted'
+        # set up the input file
+        elif opt in ['-f','--file']:
+            in_file = arg
+        
+        # set zippped boolean to true
+        elif opt in ['-z','--zipped']:
+            zipped = True
 
-
-def run_interact_mode(rubric,directory,compiler):
-    #TODO impliment me
-    return -1
-
-def run_with_files(input_file, output_file, rubric, directory,compiler):
-    #TODO impliment compilers
-
-    # dictionary to store users grades
-    grades = {}
-
-    # compiling bonus (should be an int) 
-    bonus = int(read_property('COMPILE_BONUS',rubric))
-
-    #specified filename
-    student_file = read_property('PROGRAM_NAME',rubric).strip()
-    
-    # loop over each student
-    for student in os.listdir(directory):
-        # create an entry for that student with compile grade
-        grades[student] = bonus
-
-        # open student's folder 
-        student_exe = directory+'/'+student+'/'+student_file
-
-    # run the student's file
-    subprocess.run(['python',student_exe],stdin=open(input_file),stdout=open("out.txt",'w'))
-
-    #TODO allowe user to set output file
-
-    #TODO compare out.txt with output file
-
-    #TODO grade output
-
-    return grades
-
-def read_property(prop_name,rubric):
-    # opens the rubric file
-    with open(rubric) as fl:
-        # read in all lines
-        lines = fl.readlines()
-    # find line with 'COMPILE_BONUS' property
-    for line in lines:
-        if prop_name in line:
-            # return value found after a space
-            return line.split(' ')[1]
-
-if __name__ == '__main__':
-    # handle the commandline arguments
-    input_file, output_file, rubric_file, compiler, directory, zipped = handle_args()
-
-    # unzip if needed
+    # if the directory is zipped, unzip it and set directory = unzipped
     if zipped:
-        directory = unzip(directory)       
+        #TODO impliment unzipping
+        print("unzipped: " + directory)
 
-    if input_file == None:
-        # the user wishes to interact with each program
-        grades = run_interact(rubric_file, directory, compiler)
+    return directory,in_file
 
-    else:
-        # we jsut use the input and output for each file
-        grades = run_with_files(input_file, output_file, rubric_file, directory,compiler)
+# main method
+if __name__=='__main__':
+    directory,in_file = handle_args()
